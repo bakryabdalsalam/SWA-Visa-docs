@@ -1873,8 +1873,9 @@ new SWA_CRM_Integration();
 ---
 
 **الإصدار**: 1.0.0  
-**تاريخ التحديث**: 2024  
-**المطور**: SWA Development Team  
+**تاريخ التحديث**: 19/1/2026  
+**المطور**: Bakry Abdelsalam
+**الويبسايت**: https://bakry.site
 **الترخيص**: GNU General Public License v2 or later
 
 ---
