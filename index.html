@@ -159,6 +159,41 @@
             color: #6C757D;
         }
 
+        /* Document Selector */
+        .doc-selector {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .doc-selector label {
+            font-size: 14px;
+            color: var(--text-color);
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .doc-selector select {
+            padding: 8px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .doc-selector select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .doc-selector select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(10, 77, 104, 0.1);
+        }
+
         /* Markdown Content Styles */
         .markdown-content {
             font-size: 16px;
@@ -517,6 +552,23 @@
                 font-size: 12px;
             }
 
+            .doc-selector {
+                margin: 10px 0;
+            }
+
+            .doc-selector label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 13px;
+            }
+
+            .doc-selector select {
+                width: 100%;
+                max-width: 300px;
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+
             .markdown-content table {
                 display: block;
                 width: 100%;
@@ -597,8 +649,15 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="header">
-                <h1>التوثيق الشامل - ثيم SWA Visa Commerce</h1>
-                <p>دليل شامل ومفصل لجميع الميزات والوظائف</p>
+                <h1 id="pageTitle">التوثيق الشامل - ثيم SWA Visa Commerce</h1>
+                <p id="pageDescription">دليل شامل ومفصل لجميع الميزات والوظائف</p>
+                <div class="doc-selector">
+                    <label for="docSelect">اختر نوع التوثيق:</label>
+                    <select id="docSelect">
+                        <option value="DOCUMENTATION-AR.md">التوثيق التقني الشامل</option>
+                        <option value="DOCUMENTATION-MANAGEMENT-AR.md">دليل الإدارة</option>
+                    </select>
+                </div>
             </div>
             <div class="markdown-content" id="markdownContent">
                 <div class="loading">جاري تحميل التوثيق</div>
@@ -625,28 +684,52 @@
             }
         });
 
+        // Current document file
+        let currentDocFile = 'DOCUMENTATION-AR.md';
+
+        // Document titles and descriptions
+        const docInfo = {
+            'DOCUMENTATION-AR.md': {
+                title: 'التوثيق الشامل - ثيم SWA Visa Commerce',
+                description: 'دليل شامل ومفصل لجميع الميزات والوظائف التقنية'
+            },
+            'DOCUMENTATION-MANAGEMENT-AR.md': {
+                title: 'دليل الإدارة - نظام إدارة التأشيرات SWA',
+                description: 'دليل موجه لفريق الإدارة لفهم سير العمل والأمان'
+            }
+        };
+
         // Load and render markdown file
-        async function loadDocumentation() {
+        async function loadDocumentation(fileName = currentDocFile) {
             const contentDiv = document.getElementById('markdownContent');
+            currentDocFile = fileName;
+            
+            // Update page title and description
+            const info = docInfo[fileName] || docInfo['DOCUMENTATION-AR.md'];
+            document.getElementById('pageTitle').textContent = info.title;
+            document.getElementById('pageDescription').textContent = info.description;
+            
+            // Show loading
+            contentDiv.innerHTML = '<div class="loading">جاري تحميل التوثيق</div>';
             
             // Try multiple methods to load the file
             const methods = [
                 // Method 1: Direct fetch (works with web server)
                 async () => {
-                    const response = await fetch('DOCUMENTATION-AR.md');
+                    const response = await fetch(fileName);
                     if (!response.ok) throw new Error('HTTP ' + response.status);
                     return await response.text();
                 },
                 // Method 2: Try with full path
                 async () => {
-                    const response = await fetch(window.location.pathname.replace('index.html', 'DOCUMENTATION-AR.md'));
+                    const response = await fetch(window.location.pathname.replace('index.html', fileName));
                     if (!response.ok) throw new Error('HTTP ' + response.status);
                     return await response.text();
                 },
                 // Method 3: Try relative to current directory
                 async () => {
                     const basePath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-                    const response = await fetch(basePath + 'DOCUMENTATION-AR.md');
+                    const response = await fetch(basePath + fileName);
                     if (!response.ok) throw new Error('HTTP ' + response.status);
                     return await response.text();
                 }
@@ -775,6 +858,12 @@
                 top: 0,
                 behavior: 'smooth'
             });
+        });
+
+        // Document selector change handler
+        const docSelect = document.getElementById('docSelect');
+        docSelect.addEventListener('change', function() {
+            loadDocumentation(this.value);
         });
 
         // Load documentation on page load
